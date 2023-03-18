@@ -47,11 +47,59 @@ def add_dish():
     if response.json()== "[]":
         return jsonify("-3"),400
 
-    
+
 
     # add the dish to the list
 
 
+#adding while offline - need to test it
+@app.route('/dishes/{ID}', methods=['GET'])
+def dishes_id_get():
+    dish_id = request.args.get('ID')
+    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
+    #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
+    for dish in dishes:
+        if dish.id == dish_id :
+    #need to return json object with calories,sugar,sodium
+    return jsonify({'-5'}), 404
+
+
+@app.route('/dishes/{ID}', methods=['DELETE'])
+def dishes_id_delete():
+    dish_id = request.args.get('ID')
+    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
+    #need to check in postman what happens if the dish id is not specified -return '-1' and error code 400
+    for dish in dishes:
+        if dish.id == dish_id :
+            # need to delete the dish from the dishes list
+            return jsonify({'ID': dish_id}), 200
+    return jsonify({'-5'}), 404
+
+
+@app.route('/dishes/{name}', methods=['GET'])
+def dishes_id_get():
+    dish_name = request.args.get('name')
+    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
+    #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
+    for dish in dishes:
+        if dish.name == dish_name :
+    #need to return json object with calories,sugar,sodium
+    return jsonify({'-5'}), 404
+
+
+@app.route('/dishes/{name}', methods=['DELETE'])
+def dishes_id_delete():
+    dish_name = request.args.get('name')
+    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
+    #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
+    for dish in dishes:
+        if dish.name == dish_name:
+            # need to delete the dish from the dishes list
+            return jsonify({dish.id}), 200
+    return jsonify({'-5'}), 404
+
+@app.route('/meals', methods=['POST'])
+def meals_post():
 
 
 
