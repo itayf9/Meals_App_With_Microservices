@@ -16,3 +16,7 @@ class Dishes:
 
         self.dish_counter += 1
         return new_dish
+
+    def remove_dish(self, dish: Dish):
+        self.dishes.remove(dish)
+

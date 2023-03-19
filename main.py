@@ -15,14 +15,7 @@ all_dishes = Dishes()
 
 @app.route('/dishes', methods=['GET'])
 def get_request():
-    query = 'chicken'
-    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(query)
-    response = requests.get(api_url)
-    if response.status_code == 200:
-        data = response.json()  # parse the response JSON data
-        print(data)
-    else:
-        print(f"Error: {response.status_code}")
+    pass
 
 @app.route('/dishes', methods=['POST'])
 def add_dish():
@@ -61,8 +54,8 @@ def add_dish():
 #adding while offline - need to test it
 @app.route('/dishes/<int: id>', methods=['GET'])
 def dishes_id_get(id):
-    dish_id = request.args.get('ID')
-    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
+    # dish_id = request.args.get('ID')
+    # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
     #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
     if id is None :
         return jsonify("-1"), 400
@@ -92,10 +85,10 @@ def dishes_id_delete(id):
     return jsonify({'-5'}), 404
 
 
-@app.route('/dishes/{name}', methods=['GET'])
-def dishes_id_get():
-    dish_name = request.args.get('name')
-    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
+@app.route('/dishes/<name>', methods=['GET'])
+def dishes_name_get(name):
+    #dish_name = request.args.get('name')
+    #api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
     #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
     if name is None :
         return jsonify("-1"), 400
@@ -123,7 +116,7 @@ def dishes_id_delete(name):
 
 @app.route('/meals', methods=['POST'])
 def meals_post():
-
+    pass
 
 
 # import requests
