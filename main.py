@@ -64,21 +64,31 @@ def dishes_id_get(id):
     dish_id = request.args.get('ID')
     api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
     #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
-    for dish in dishes:
-        if dish.id == dish_id :
-    #need to return json object with calories,sugar,sodium
+    if id is None :
+        return jsonify("-1"), 400
+
+    for dish in all_dishes.dishes:
+        if dish.id == id :
+            return jsonify(dish),200
+
     return jsonify({'-5'}), 404
 
 
-@app.route('/dishes/{ID}', methods=['DELETE'])
-def dishes_id_delete():
-    dish_id = request.args.get('ID')
-    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
+@app.route('/dishes/<int: id>', methods=['DELETE'])
+def dishes_id_delete(id):
+    #dish_id = request.args.get('ID')
+    #api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(all_dishes.dish_id)
     #need to check in postman what happens if the dish id is not specified -return '-1' and error code 400
-    for dish in dishes:
-        if dish.id == dish_id :
+
+    if id is None :
+        return jsonify("-1"), 400
+
+    for dish in all_dishes.dishes:
+        if dish.id == id :
             # need to delete the dish from the dishes list
-            return jsonify({'ID': dish_id}), 200
+            all_dishes.remove_dish(dish)
+            return jsonify(id), 200
+
     return jsonify({'-5'}), 404
 
 
@@ -87,21 +97,28 @@ def dishes_id_get():
     dish_name = request.args.get('name')
     api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
     #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
-    for dish in dishes:
-        if dish.name == dish_name :
-    #need to return json object with calories,sugar,sodium
+    if name is None :
+        return jsonify("-1"), 400
+
+    for dish in all_dishes.dishes:
+        if dish.name == all_dishes.dishes :
+            return jsonify(dish), 200
+
     return jsonify({'-5'}), 404
 
 
-@app.route('/dishes/{name}', methods=['DELETE'])
-def dishes_id_delete():
-    dish_name = request.args.get('name')
-    api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
-    #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
-    for dish in dishes:
-        if dish.name == dish_name:
+@app.route('/dishes/<name>', methods=['DELETE'])
+def dishes_id_delete(name):
+
+    if name is None:
+        return jsonify("-1"), 400
+
+    for dish in all_dishes.dishes:
+        if dish.name == name:
             # need to delete the dish from the dishes list
-            return jsonify({dish.id}), 200
+            all_dishes.remove_dish(dish)
+            return jsonify(dish.ID), 200
+
     return jsonify({'-5'}), 404
 
 @app.route('/meals', methods=['POST'])
@@ -109,11 +126,7 @@ def meals_post():
 
 
 
-
-
-
 # import requests
-#
 # query = '1lb brisket and fries'
 # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(query)
 # response = requests.get(api_url, headers={'X-Api-Key': 'YOUR_API_KEY'})
