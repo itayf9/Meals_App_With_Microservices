@@ -3,12 +3,16 @@ import json
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api, reqparse
 
+from config import ninja_api_key
+from dishes import Dishes
+from dish import Dish
+
 # initialize
 app = Flask(__name__)
 api = Api(app)
 
-dishes = []
-dish_counter = 0
+all_dishes = Dishes()
+
 @app.route('/dishes', methods=['GET'])
 def get_request():
     query = 'chicken'
@@ -34,13 +38,13 @@ def add_dish():
         # the parameter name is incorrect or missing
         return jsonify({"-1"}), 400
 
-    for dish in dishes :
+    for dish in all_dishes.dishes :
         if dish.name == new_dish_name:
             return jsonify({"-2"}), 400
 
     # get dish parameters from ninja
     api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(new_dish_name)
-    response = requests.get(api_url, headers={'X-Api-Key': 'ahDpqFpHgyqwAr5LuKVj9g==zubOWauapvwkelSm'})
+    response = requests.get(api_url, headers={'X-Api-Key': ninja_api_key })
 
     if response.status_code != requests.codes.ok:
         return jsonify("-4"), 400
@@ -50,11 +54,13 @@ def add_dish():
 
     new_dish= all_dishes.create_new_dish_from_ninja(response.json())
     # add the dish to the list
+    all_dishes.add_dish(new_dish)
+    return jsonify(new_dish.ID),201
 
 
 #adding while offline - need to test it
-@app.route('/dishes/{ID}', methods=['GET'])
-def dishes_id_get():
+@app.route('/dishes/<int: id>', methods=['GET'])
+def dishes_id_get(id):
     dish_id = request.args.get('ID')
     api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
     #need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
