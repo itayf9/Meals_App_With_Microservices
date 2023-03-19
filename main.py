@@ -1,4 +1,5 @@
 import requests
+import json
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api, reqparse
 
@@ -47,8 +48,7 @@ def add_dish():
     if response.json()== "[]":
         return jsonify("-3"),400
 
-
-
+    new_dish= all_dishes.create_new_dish_from_ninja(response.json())
     # add the dish to the list
 
 
@@ -100,6 +100,8 @@ def dishes_id_delete():
 
 @app.route('/meals', methods=['POST'])
 def meals_post():
+
+
 
 
 
