@@ -19,4 +19,3 @@ class Dishes:
 
     def remove_dish(self, dish: Dish):
         self.dishes.remove(dish)
-
