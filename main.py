@@ -33,8 +33,8 @@ def all_dishes_post():
         # the parameter name is incorrect or missing
         return jsonify(-1), 400
 
-    for dish in all_dishes.dishes:
-        if dish.name == new_dish_name:
+    for dish in all_dishes.dishes.values():
+        if dish.name in new_dish_name:
             return jsonify(-2), 400
 
     # get dish parameters from ninja
@@ -44,7 +44,7 @@ def all_dishes_post():
     if response.status_code != requests.codes.ok:
         return jsonify(-4), 400
 
-    if response.json() == "[]":
+    if len(response.json())==0:
         return jsonify(-3), 400
 
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
@@ -53,7 +53,20 @@ def all_dishes_post():
     return jsonify(new_dish.ID), 201
 
 
-# adding while offline - need to test it
+
+@app.route('/dishes/', methods=['DELETE'])
+def dishes_not_specified_delete() :
+    return jsonify(-1),400
+
+@app.route('/dishes/', methods=['GET'])
+def dishes_not_specified_get():
+    return all_dishes_get()
+
+@app.route('/dishes', methods=['DELETE'])
+def all_dishes_delete():
+    return jsonify(-1), 400
+
+
 @app.route('/dishes/<int:id>', methods=['GET'])
 def dishes_id_get(id):
     # dish_id = request.args.get('ID')
@@ -89,15 +102,13 @@ def dishes_id_delete(id):
 
 @app.route('/dishes/<name>', methods=['GET'])
 def dishes_name_get(name):
-    # dish_name = request.args.get('name')
-    # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
-    # need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
+
     if name is None:
         return jsonify(-1), 400
 
-    for dish in all_dishes.dishes:
-        if dish.name == all_dishes.dishes:
-            return jsonify(dish), 200
+    for key, value in all_dishes.dishes.items():
+        if value.name == name:
+            return jsonify(value.asdict()), 200
 
     return jsonify(-5), 404
 
@@ -107,11 +118,11 @@ def dishes_name_delete(name):
     if name is None:
         return jsonify(-1), 400
 
-    for dish in all_dishes.dishes:
-        if dish.name == name:
-            # need to delete the dish from the dishes list
-            all_dishes.remove_dish(dish)
-            return jsonify(dish.ID), 200
+    for key, value in all_dishes.dishes.items():
+        if value.name == name:
+            # delete the dish from the dishes list
+            all_dishes.remove_dish_by_id(key)
+            return jsonify(key), 200
 
     return jsonify(-5), 404
 
@@ -136,13 +147,15 @@ def meals_post():
 
 # meals endpoint return meal id
 #
-# all return values should be int and not string
+# all return values should be int and not string -done
 #
-# handle dish with more than one igredient from ninja
+# handle dish with more than one igredient from ninja -done
 #
 # all meals endpoint
 #
-# fix response of get /dishs
+# fix response of get /dishs -done
+#
+# fix  get dishes/id not specified
 
 
 

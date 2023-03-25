@@ -3,11 +3,11 @@ from dish import Dish
 
 class Dishes:
     def __init__(self):
-        self.dishes = []
+        self.dishes = {}
         self.dish_counter = 1
 
     def add_dish(self, dish: Dish):
-        self.dishes.append(dish)
+        self.dishes.update({dish.ID: dish})
 
     def create_new_dish_from_ninja(self ,new_dish_name: str,  ninja_json: list):
         print(type(ninja_json))
