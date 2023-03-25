@@ -35,7 +35,7 @@ def all_dishes_post():
 
     for dish in all_dishes.dishes:
         if dish.name == new_dish_name:
-            return jsonify({"-2"}), 400
+            return jsonify(-2), 400
 
     # get dish parameters from ninja
     api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(new_dish_name)
@@ -45,9 +45,9 @@ def all_dishes_post():
         return jsonify("-4"), 400
 
     if response.json() == "[]":
-        return jsonify("-3"), 400
+        return jsonify(-3), 400
 
-    new_dish = all_dishes.create_new_dish_from_ninja(response.json()[0])
+    new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
     # add the dish to the list
     all_dishes.add_dish(new_dish)
     return jsonify(new_dish.ID), 201
@@ -60,7 +60,7 @@ def dishes_id_get(id):
     # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_id)
     # need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
     if id is None:
-        return jsonify("-1"), 400
+        return jsonify(-1), 400
 
     for dish in all_dishes.dishes:
         if dish.id == id:
@@ -76,7 +76,7 @@ def dishes_id_delete(id):
     # need to check in postman what happens if the dish id is not specified -return '-1' and error code 400
 
     if id is None:
-        return jsonify("-1"), 400
+        return jsonify(-1), 400
 
     for dish in all_dishes.dishes:
         if dish.id == id:
@@ -84,7 +84,7 @@ def dishes_id_delete(id):
             all_dishes.remove_dish(dish)
             return jsonify(id), 200
 
-    return jsonify({'-5'}), 404
+    return jsonify(-5), 404
 
 
 @app.route('/dishes/<name>', methods=['GET'])
@@ -93,13 +93,13 @@ def dishes_name_get(name):
     # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(dish_name)
     # need to check in postman what happens if the dish name is not specified -return '-1' and error code 400
     if name is None:
-        return jsonify("-1"), 400
+        return jsonify(-1), 400
 
     for dish in all_dishes.dishes:
         if dish.name == all_dishes.dishes:
             return jsonify(dish), 200
 
-    return jsonify({'-5'}), 404
+    return jsonify(-5), 404
 
 
 @app.route('/dishes/<name>', methods=['DELETE'])
@@ -130,6 +130,7 @@ def meals_post():
     new_meal_appetizer_id = request.args.get('appetizer')
     new_meal_main = request.args.get('main')
     new_meal_dessert = request.args.get('dessert')
+
 
 
 
