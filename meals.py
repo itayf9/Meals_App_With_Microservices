@@ -1,6 +1,5 @@
+from dishes import all_dishes
 from meal import Meal
-from main import all_dishes
-
 
 class Meals:
     def __init__(self):
@@ -12,6 +11,7 @@ class Meals:
 
     def create_new_meal_from_dishes(self, new_meal_name, new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id):
         # fetches the dishes from all dishes map
+
         appetizer = all_dishes.dishes.get(new_meal_appetizer_id)
         main = all_dishes.dishes.get(new_meal_main_id)
         dessert = all_dishes.dishes.get(new_meal_dessert_id)

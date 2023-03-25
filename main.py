@@ -4,19 +4,12 @@ from flask import Flask, jsonify, request
 # from flask_restful import Resource, Api, reqparse
 
 from config import ninja_api_key
-from dishes import Dishes
 from dish import DishEncoder
 from meal import MealEncoder
-
-from meals import Meals
-from dish import Dish
 
 # initialize
 app = Flask(__name__)
 # api = Api(app)
-
-all_dishes = Dishes()
-all_meals = Meals()
 
 
 @app.route('/dishes', methods=['GET'])
@@ -137,11 +130,11 @@ def all_meals_post():
     # checks the content type of the request
     if request.content_type != "application/json":
         return jsonify(0), 415
-
-    new_meal_name = request.args.get('name')
-    new_meal_appetizer_id = request.args.get('appetizer')
-    new_meal_main_id = request.args.get('main')
-    new_meal_dessert_id = request.args.get('dessert')
+    json_meals_data = request.json
+    new_meal_name = json_meals_data['name']
+    new_meal_appetizer_id = json_meals_data.get('appetizer')
+    new_meal_main_id = json_meals_data.get('main')
+    new_meal_dessert_id = json_meals_data.get('dessert')
 
     # checks if the 'name', 'appetizer', 'main', 'dessert' fields are specified
     if new_meal_name is None \
