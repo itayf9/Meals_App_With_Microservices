@@ -24,14 +24,14 @@ def all_dishes_get():
 def all_dishes_post():
     # checks the content type of the request
     if request.content_type != "application/json":
-        return jsonify({"0"}), 415
+        return jsonify(0), 415
 
     # fetches the dish name
     new_dish_name = request.args.get('name')
     # checks if the 'name' field is specified
     if new_dish_name is None:
         # the parameter name is incorrect or missing
-        return jsonify({"-1"}), 400
+        return jsonify(-1), 400
 
     for dish in all_dishes.dishes:
         if dish.name == new_dish_name:
@@ -42,7 +42,7 @@ def all_dishes_post():
     response = requests.get(api_url, headers={'X-Api-Key': ninja_api_key})
 
     if response.status_code != requests.codes.ok:
-        return jsonify("-4"), 400
+        return jsonify(-4), 400
 
     if response.json() == "[]":
         return jsonify(-3), 400
@@ -66,7 +66,7 @@ def dishes_id_get(id):
         if dish.id == id:
             return jsonify(dish), 200
 
-    return jsonify({'-5'}), 404
+    return jsonify(-5), 404
 
 
 @app.route('/dishes/<int:id>', methods=['DELETE'])
@@ -105,7 +105,7 @@ def dishes_name_get(name):
 @app.route('/dishes/<name>', methods=['DELETE'])
 def dishes_name_delete(name):
     if name is None:
-        return jsonify("-1"), 400
+        return jsonify(-1), 400
 
     for dish in all_dishes.dishes:
         if dish.name == name:
@@ -113,7 +113,7 @@ def dishes_name_delete(name):
             all_dishes.remove_dish(dish)
             return jsonify(dish.ID), 200
 
-    return jsonify({'-5'}), 404
+    return jsonify(-5), 404
 
 
 @app.route('/meals', methods=['POST'])
@@ -134,7 +134,15 @@ def meals_post():
 
 
 
-
+# meals endpoint return meal id
+#
+# all return values should be int and not string
+#
+# handle dish with more than one igredient from ninja
+#
+# all meals endpoint
+#
+# fix response of get /dishs
 
 
 
