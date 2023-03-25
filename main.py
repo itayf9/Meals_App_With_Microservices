@@ -137,7 +137,7 @@ def all_meals_post():
     if request.content_type != "application/json":
         return jsonify(0), 415
     json_meals_data = request.json
-    new_meal_name = json_meals_data['name']
+    new_meal_name = json_meals_data.get('name')
     new_meal_appetizer_id = json_meals_data.get('appetizer')
     new_meal_main_id = json_meals_data.get('main')
     new_meal_dessert_id = json_meals_data.get('dessert')
@@ -177,6 +177,89 @@ def all_meals_get():
     return jsonify(all_meals_json_dict), 200
 
 
+@app.route('/meals/<int:id>', methods=['GET'])
+def meals_id_get(id):
+
+    requested_meal = all_meals.meals.get(id)
+
+    if requested_meal is None:
+        return jsonify(-5), 404
+
+    return jsonify(requested_meal.asdict()), 200
+
+@app.route('/meals/', methods=['GET'])
+def meals_get_not_specified():
+    return all_meals_get()
+
+
+@app.route('/meals/<int:id>', methods=['DELETE'])
+def meals_id_delete(id):
+    requested_meal = all_meals.meals.get(id)
+    if requested_meal is None:
+        return jsonify(-5), 404
+    all_meals.remove_meal_by_id(id)
+    return jsonify(id), 200
+
+@app.route('/meals/', methods=['DELETE'])
+def meals_delete_not_specified():
+    return jsonify(-1), 400
+
+@app.route('/meals', methods=['DELETE'])
+def all_meals_delete():
+    return jsonify(-1), 400
+
+@app.route('/meals/<int:id>', methods=['PUT'])
+def meals_id_put(id):
+    requested_meal = all_meals.meals.get(id)
+
+    if requested_meal is None:
+        # verify if need to check
+        pass
+
+    # checks the content type of the request
+    if request.content_type != "application/json":
+        return jsonify(0), 415
+
+    json_meals_data = request.json
+    new_meal_name = json_meals_data.get('name')
+    new_meal_appetizer_id = json_meals_data.get('appetizer')
+    new_meal_main_id = json_meals_data.get('main')
+    new_meal_dessert_id = json_meals_data.get('dessert')
+
+    # checks if the 'name', 'appetizer', 'main', 'dessert' fields are specified
+    if new_meal_name is None \
+            or new_meal_appetizer_id is None \
+            or new_meal_main_id is None \
+            or new_meal_dessert_id is None:
+        # the parameter name or appetizer or main or dessert is incorrect or missing
+        return jsonify(-1), 400
+
+    # updates the meal
+    requested_meal.update_meal(new_meal_name, new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
+
+    return jsonify(id), 200
+
+
+
+@app.route('/meals/<name>', methods=['GET'])
+def meals_name_get(name):
+
+    for key, value in all_meals.meals.items():
+        if value.name == name:
+            return jsonify(value.asdict()), 200
+
+    return jsonify(-5), 404
+
+
+@app.route('/meals/<name>', methods=['DELETE'])
+def meals_name_delete(name):
+
+    for key, value in all_meals.meals.items():
+        if value.name == name:
+            all_meals.remove_meal_by_id(key)
+            return jsonify(key), 200
+
+    return jsonify(-5), 404
 
 # meals endpoint return meal id
 #

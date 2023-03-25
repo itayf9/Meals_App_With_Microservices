@@ -28,7 +28,6 @@ class Meals:
 
         return new_meal
 
-
     def remove_meal(self, meal: Meal):
         self.meals.remove(meal)
 
