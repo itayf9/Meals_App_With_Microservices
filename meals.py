@@ -35,3 +35,6 @@ class Meals:
         # def remove_dish_by_id(self, dishID: int):
         #     self.dishes.pop(dishID)
 
+
+
+all_meals = Meals()

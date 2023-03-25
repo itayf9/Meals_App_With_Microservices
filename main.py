@@ -7,10 +7,16 @@ from config import ninja_api_key
 from dish import DishEncoder
 from meal import MealEncoder
 
+from dishes import all_dishes
+from meals import all_meals
+
 # initialize
 app = Flask(__name__)
 # api = Api(app)
 
+
+# all_meals = Meals()
+# all_dishes = Dishes()
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
