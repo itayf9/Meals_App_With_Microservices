@@ -272,6 +272,10 @@ def meals_name_delete(name):
 # fix response of get /dishs -done
 #
 # fix  get dishes/id not specified
+#
+# fix put meals/id when the meal with the id does not exist
+#
+# fix duplicated dish added
 
 
 # import requests

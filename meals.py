@@ -28,12 +28,8 @@ class Meals:
 
         return new_meal
 
-    def remove_meal(self, meal: Meal):
-        self.meals.remove(meal)
-
-        # def remove_dish_by_id(self, dishID: int):
-        #     self.dishes.pop(dishID)
-
+    def remove_meal_by_id(self, mealID: int):
+        self.meals.pop(mealID)
 
 
 all_meals = Meals()
