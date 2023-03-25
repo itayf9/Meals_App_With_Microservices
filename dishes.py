@@ -28,5 +28,5 @@ class Dishes:
         self.dish_counter += 1
         return new_dish
 
-    def remove_dish(self, dish: Dish):
-        self.dishes.remove(dish)
+    def remove_dish_by_id(self, dishID: int):
+        self.dishes.pop(dishID)
