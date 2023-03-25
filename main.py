@@ -34,7 +34,7 @@ def all_dishes_post():
         return jsonify(-1), 400
 
     for dish in all_dishes.dishes.values():
-        if dish.name in new_dish_name:
+        if dish.name == new_dish_name:
             return jsonify(-2), 400
 
     # get dish parameters from ninja
@@ -124,10 +124,7 @@ def dishes_name_delete(name):
 
 
 @app.route('/meals', methods=['POST'])
-def meals_post():
-
-
-
+def all_meals_post():
     # "name": "vegetarian",
     # "appetizer": "1",
     # "main": "8",
