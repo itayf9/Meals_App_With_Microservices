@@ -1,24 +1,30 @@
 import requests
 import json
 from flask import Flask, jsonify, request
-#from flask_restful import Resource, Api, reqparse
+# from flask_restful import Resource, Api, reqparse
 
 from config import ninja_api_key
 from dishes import Dishes
 from dish import DishEncoder
+from meal import MealEncoder
+
+from meals import Meals
 from dish import Dish
 
 # initialize
 app = Flask(__name__)
-#api = Api(app)
+# api = Api(app)
 
 all_dishes = Dishes()
+all_meals = Meals()
+
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
     all_dishes_json_str = json.dumps(all_dishes.dishes, cls=DishEncoder)
     all_dishes_json_dict = json.loads(all_dishes_json_str)
     return jsonify(all_dishes_json_dict), 200
+
 
 @app.route('/dishes', methods=['POST'])
 def all_dishes_post():
@@ -33,6 +39,7 @@ def all_dishes_post():
         # the parameter name is incorrect or missing
         return jsonify(-1), 400
 
+    # checks if the new dish already exists in all_dishes
     for dish in all_dishes.dishes.values():
         if dish.name == new_dish_name:
             return jsonify(-2), 400
@@ -44,7 +51,7 @@ def all_dishes_post():
     if response.status_code != requests.codes.ok:
         return jsonify(-4), 400
 
-    if len(response.json())==0:
+    if len(response.json()) == 0:
         return jsonify(-3), 400
 
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
@@ -53,14 +60,15 @@ def all_dishes_post():
     return jsonify(new_dish.ID), 201
 
 
-
 @app.route('/dishes/', methods=['DELETE'])
-def dishes_not_specified_delete() :
-    return jsonify(-1),400
+def dishes_not_specified_delete():
+    return jsonify(-1), 400
+
 
 @app.route('/dishes/', methods=['GET'])
 def dishes_not_specified_get():
     return all_dishes_get()
+
 
 @app.route('/dishes', methods=['DELETE'])
 def all_dishes_delete():
@@ -69,7 +77,6 @@ def all_dishes_delete():
 
 @app.route('/dishes/<int:id>', methods=['GET'])
 def dishes_id_get(id):
-
     if id is None:
         return jsonify(-1), 400
 
@@ -82,7 +89,6 @@ def dishes_id_get(id):
 
 @app.route('/dishes/<int:id>', methods=['DELETE'])
 def dishes_id_delete(id):
-
     if id is None:
         return jsonify(-1), 400
 
@@ -97,7 +103,6 @@ def dishes_id_delete(id):
 
 @app.route('/dishes/<name>', methods=['GET'])
 def dishes_name_get(name):
-
     if name is None:
         return jsonify(-1), 400
 
@@ -110,7 +115,6 @@ def dishes_name_get(name):
 
 @app.route('/dishes/<name>', methods=['DELETE'])
 def dishes_name_delete(name):
-
     if name is None:
         return jsonify(-1), 400
 
@@ -130,11 +134,48 @@ def all_meals_post():
     # "main": "8",
     # "dessert": "13"}
 
+    # checks the content type of the request
+    if request.content_type != "application/json":
+        return jsonify(0), 415
+
     new_meal_name = request.args.get('name')
     new_meal_appetizer_id = request.args.get('appetizer')
-    new_meal_main = request.args.get('main')
-    new_meal_dessert = request.args.get('dessert')
+    new_meal_main_id = request.args.get('main')
+    new_meal_dessert_id = request.args.get('dessert')
 
+    # checks if the 'name', 'appetizer', 'main', 'dessert' fields are specified
+    if new_meal_name is None \
+            or new_meal_appetizer_id is None \
+            or new_meal_main_id is None \
+            or new_meal_dessert_id is None:
+        # the parameter name or appetizer or main or dessert is incorrect or missing
+        return jsonify(-1), 400
+
+    # checks if the new meal already exists in all_meals
+    for meal in all_meals.meals.values():
+        if meal.name == new_meal_name:
+            return jsonify(-2), 400
+
+    # checks if all the dishes exist
+    if not new_meal_dessert_id in all_dishes.dishes \
+            or not new_meal_main_id in all_dishes.dishes \
+            or not new_meal_dessert_id in all_dishes.dishes:
+        return jsonify(-5), 400
+
+    new_meal = all_meals.create_new_meal_from_dishes(new_meal_name,
+                                                     new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
+
+    all_meals.add_meal(new_meal)
+
+    return jsonify(new_meal.ID), 201
+
+
+
+@app.route('/meals', methods=['GET'])
+def all_meals_get():
+    all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
+    all_meals_json_dict = json.loads(all_meals_json_str)
+    return jsonify(all_meals_json_dict), 200
 
 
 
@@ -149,12 +190,6 @@ def all_meals_post():
 # fix response of get /dishs -done
 #
 # fix  get dishes/id not specified
-
-
-
-
-
-
 
 
 # import requests

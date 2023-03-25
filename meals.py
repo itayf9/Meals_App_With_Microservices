@@ -1,4 +1,5 @@
 from meal import Meal
+from main import all_dishes
 
 
 class Meals:
@@ -30,3 +31,7 @@ class Meals:
 
     def remove_meal(self, meal: Meal):
         self.meals.remove(meal)
+
+        # def remove_dish_by_id(self, dishID: int):
+        #     self.dishes.pop(dishID)
+

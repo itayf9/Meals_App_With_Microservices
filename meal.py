@@ -10,3 +10,11 @@ class Meal:
         self.sodium = sodium
         self.sugar = sugar
 
+    def asdict(self):
+        return {'name': self.name, 'ID': self.ID,
+                'appetizer': self.appetizer, 'main': self.main, 'dessert': self.dessert,
+                'cal': self.cal, 'sodium': self.sodium, 'sugar': self.sugar}
+
+class MealEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__

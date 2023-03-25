@@ -13,14 +13,8 @@ class Dish:
     def asdict(self):
         return {'name': self.name, 'ID': self.ID, 'cal': self.cal, 'sodium': self.sodium, 'size': self.size, 'sugar': self.sugar}
 
-    # def drive(self):
-    #     print(f"The {self.year} {self.make} {self.model} is driving.")
-
 
 class DishEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
 
-#
-# my_car = Car("Honda", "Civic", 2022)
-# my_car.drive()  # Output: The 2022 Honda Civic is driving.
