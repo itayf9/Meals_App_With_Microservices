@@ -258,7 +258,7 @@ def meals_name_delete(name):
 
     return jsonify(-5), 404
 
-# meals endpoint return meal id
+# meals endpoint return meal id -done
 #
 # all return values should be int and not string -done
 #
@@ -268,21 +268,11 @@ def meals_name_delete(name):
 #
 # fix response of get /dishs -done
 #
-# fix  get dishes/id not specified
+# fix  get dishes/id not specified -done
 #
-# fix put meals/id when the meal with the id does not exist
+# fix put meals/id when the meal with the id does not exist- no need
 #
-# fix duplicated dish added
-
-
-# import requests
-# query = '1lb brisket and fries'
-# api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(query)
-# response = requests.get(api_url, headers={'X-Api-Key': 'YOUR_API_KEY'})
-# if response.status_code == requests.codes.ok:
-#     print(response.text)
-# else:
-#     print("Error:", response.status_code, response.text)
+# fix duplicated dish added- happend once dont know why
 
 
 if __name__ == '__main__':
