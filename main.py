@@ -212,14 +212,11 @@ def all_meals_delete():
 def meals_id_put(id):
     requested_meal = all_meals.meals.get(id)
 
-    if requested_meal is None:
-        # verify if need to check
-        pass
-
     # checks the content type of the request
     if request.content_type != "application/json":
         return jsonify(0), 415
 
+    # fetch all the fields from the request
     json_meals_data = request.json
     new_meal_name = json_meals_data.get('name')
     new_meal_appetizer_id = json_meals_data.get('appetizer')

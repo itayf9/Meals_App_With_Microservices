@@ -1,7 +1,8 @@
-#FROM python:3.10
-#COPY ./requirements.txt /app/requirements.txt
-#WORKDIR /app
-#RUN pip install -r requirements.txt
-#COPY . /app
-#ENTRYPOINT [ "python" ]
-#CMD ["app_docker.py" ]
+FROM python:3.9
+WORKDIR ./app
+COPY . .
+RUN pip install flask
+RUN pip install requests
+EXPOSE 8000
+
+CMD ["python3", "main.py"]

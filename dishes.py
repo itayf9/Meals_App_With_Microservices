@@ -9,8 +9,7 @@ class Dishes:
     def add_dish(self, dish: Dish):
         self.dishes.update({dish.ID: dish})
 
-    def create_new_dish_from_ninja(self ,new_dish_name: str,  ninja_json: list):
-        print(type(ninja_json))
+    def create_new_dish_from_ninja(self, new_dish_name: str,  ninja_json: list):
 
         calories = 0
         sodium = 0
