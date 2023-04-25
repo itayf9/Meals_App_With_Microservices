@@ -32,7 +32,8 @@ def all_dishes_post():
         return jsonify(0), 415
 
     # fetches the dish name
-    new_dish_name = request.args.get('name')
+    json_new_dish_name_data = request.json
+    new_dish_name = json_new_dish_name_data.get('name')
     # checks if the 'name' field is specified
     if new_dish_name is None:
         # the parameter name is incorrect or missing
