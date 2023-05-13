@@ -20,9 +20,12 @@ app = Flask(__name__)
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
-    all_dishes_json_str = json.dumps(all_dishes.dishes, cls=DishEncoder)
-    all_dishes_json_dict = json.loads(all_dishes_json_str)
-    return jsonify(all_dishes_json_dict), 200
+    # all_dishes_json_str = json.dumps(all_dishes.dishes, cls=DishEncoder)
+    # all_dishes_json_dict = json.loads(all_dishes_json_str)
+
+    all_dishes_json_array = all_dishes.convert_dictionary_to_array()
+
+    return json.dumps(all_dishes_json_array, cls=DishEncoder), 200
 
 
 @app.route('/dishes', methods=['POST'])
@@ -173,9 +176,26 @@ def all_meals_post():
 
 @app.route('/meals', methods=['GET'])
 def all_meals_get():
-    all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
-    all_meals_json_dict = json.loads(all_meals_json_str)
-    return jsonify(all_meals_json_dict), 200
+
+    # all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
+    # all_meals_json_dict = json.loads(all_meals_json_str)
+
+    all_meals_json_array = all_meals.convert_dictionary_to_array()
+
+    diet_from_query_parameter = request.args.get('diet')
+    if diet_from_query_parameter is not None:
+        # fetches diet from diet service
+        diet_from_service = {}
+        diet_filter_meals = []
+        for meal in all_meals_json_array:
+            if meal.meal.cal <= diet_from_service.get('cal') \
+            and meal.meal.sodium <= diet_from_service.get('sodium') \
+            and meal.meal.sugar <= diet_from_service.get('sugar'):
+                diet_filter_meals.append(meal)
+
+        return json.dumps(diet_filter_meals, cls=MealEncoder), 200
+
+    return json.dumps(all_meals_json_array, cls=MealEncoder), 200
 
 
 @app.route('/meals/<int:id>', methods=['GET'])
