@@ -14,6 +14,7 @@ class Dish:
         return {'name': self.name, 'ID': self.ID, 'cal': self.cal, 'sodium': self.sodium, 'size': self.size, 'sugar': self.sugar}
 
 
+
 class DishEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__

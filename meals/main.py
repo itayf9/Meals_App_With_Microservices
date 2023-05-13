@@ -1,6 +1,6 @@
 import requests
 import json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, json
 # from flask_restful import Resource, Api, reqparse
 
 from config import ninja_api_key

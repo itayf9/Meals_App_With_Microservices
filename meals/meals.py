@@ -28,6 +28,14 @@ class Meals:
 
         return new_meal
 
+    def convert_dictionary_to_array(self):
+        meal_array_to_return = []
+
+        for meal_id, meal_object in self.meals.items():
+            meal_array_to_return.append({"_id": meal_id, "meal": meal_object})
+
+        return meal_array_to_return
+
     def remove_meal_by_id(self, mealID: int):
         self.meals.pop(mealID)
 
