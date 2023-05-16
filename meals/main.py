@@ -24,6 +24,7 @@ counter = 3
 
 @app.route('/test', methods=['POST'])
 def test1():
+    global counter
     json_new_dish_name_data = request.json
     new_dish_name = json_new_dish_name_data.get('name')
 
