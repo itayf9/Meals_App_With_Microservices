@@ -10,10 +10,31 @@ from meal import MealEncoder
 from dishes import all_dishes
 from meals import all_meals
 
+import pymongo
+
 # initialize
 app = Flask(__name__)
 # api = Api(app)
 
+client = pymongo.MongoClient("mongodb://mongo:27017/")
+db = client["mealsdb"]
+meals_collection = db["meals"]
+
+@app.route('/test', methods=['POST'])
+def test1():
+    json_new_dish_name_data = request.json
+    new_dish_name = json_new_dish_name_data.get('name')
+
+    meals_collection.insert_one({"_id": 0, "dish_name": new_dish_name})
+
+    return jsonify(), 200
+
+
+@app.route('/test', methods=['GET'])
+def test2():
+    dish = meals_collection.find_one()({"_id": 0})
+
+    return jsonify(dish), 200
 
 # all_meals = Meals()
 # all_dishes = Dishes()
