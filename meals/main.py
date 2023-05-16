@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request, json
 # from flask_restful import Resource, Api, reqparse
 
 from config import ninja_api_key
-from dish import DishEncoder
+from dish import DishEncoder, Dish
 from meal import MealEncoder
 
 from dishes import all_dishes
@@ -20,21 +20,32 @@ client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client["mealsdb"]
 meals_collection = db["meals"]
 
+counter = 3
+
 @app.route('/test', methods=['POST'])
 def test1():
     json_new_dish_name_data = request.json
     new_dish_name = json_new_dish_name_data.get('name')
 
-    meals_collection.insert_one({"_id": 0, "dish_name": new_dish_name})
+    new_dish = Dish(new_dish_name, counter, 0, 0, 0, 0)
 
+    meals_collection.insert_one({"_id": counter, "dish": {new_dish}})
+    counter += 1
     return jsonify(), 200
 
 
 @app.route('/test', methods=['GET'])
 def test2():
-    dish = meals_collection.find_one()({"_id": 0})
+    dish = meals_collection.find_one({"_id": 0})
 
     return jsonify(dish), 200
+
+@app.route('/testAll', methods=['GET'])
+def test3():
+    cursor = meals_collection.find()
+    cursor_list = list(cursor)
+
+    return jsonify(cursor_list), 200
 
 # all_meals = Meals()
 # all_dishes = Dishes()
@@ -318,4 +329,4 @@ def meals_name_delete(name):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
