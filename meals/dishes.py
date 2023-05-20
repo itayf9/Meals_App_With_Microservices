@@ -13,7 +13,7 @@ class Dishes:
         dish_array_to_return = []
 
         for dish_id, dish_object in self.dishes.items():
-            dish_array_to_return.append({"_id": dish_id, "dish": dish_object})
+            dish_array_to_return.append(dish_object.asdict())
 
         return dish_array_to_return
 

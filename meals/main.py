@@ -19,34 +19,51 @@ app = Flask(__name__)
 client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client["mealsdb"]
 meals_collection = db["meals"]
+dishes_collection = db["dishes"]
 
-counter = 3
+# initializes the meals and dished from DB
+dishes_list_from_db = list(dishes_collection.find())
+max_id_number = 0
+for dish_from_db in dishes_list_from_db:
+    all_dishes.add_dish(dish_from_db)
+    max_id_number = max(max_id_number, dish_from_db.get("_id"))
+all_dishes.dish_counter = max_id_number + 1
 
-@app.route('/test', methods=['POST'])
-def test1():
-    global counter
-    json_new_dish_name_data = request.json
-    new_dish_name = json_new_dish_name_data.get('name')
-
-    new_dish = Dish(new_dish_name, counter, 0, 0, 0, 0)
-
-    meals_collection.insert_one({"_id": counter, "dish": {new_dish}})
-    counter += 1
-    return jsonify(), 200
+meals_list_from_db = list(meals_collection.find())
+max_id_number = 0
+for meal_from_db in meals_list_from_db:
+    all_meals.add_meal(meal_from_db)
+    max_id_number = max(max_id_number, meal_from_db.get("_id"))
+all_meals.meal_counter = max_id_number + 1
 
 
-@app.route('/test', methods=['GET'])
-def test2():
-    dish = meals_collection.find_one({"_id": 0})
+# counter = 3
 
-    return jsonify(dish), 200
-
-@app.route('/testAll', methods=['GET'])
-def test3():
-    cursor = meals_collection.find()
-    cursor_list = list(cursor)
-
-    return jsonify(cursor_list), 200
+# @app.route('/test', methods=['POST'])
+# def test1():
+#     global counter
+#     json_new_dish_name_data = request.json
+#     new_dish_name = json_new_dish_name_data.get('name')
+#
+#     new_dish = Dish(new_dish_name, counter, 0, 0, 0, 0)
+#
+#     meals_collection.insert_one({"_id": counter, "dish": new_dish.asdict()})
+#     counter += 1
+#     return jsonify(), 200
+#
+#
+# @app.route('/test', methods=['GET'])
+# def test2():
+#     dish = meals_collection.find_one({"_id": 0})
+#
+#     return jsonify(dish), 200
+#
+# @app.route('/testAll', methods=['GET'])
+# def test3():
+#     cursor = meals_collection.find()
+#     cursor_list = list(cursor)
+#
+#     return jsonify(cursor_list), 200
 
 # all_meals = Meals()
 # all_dishes = Dishes()
@@ -206,10 +223,8 @@ def all_meals_post():
     return jsonify(new_meal.ID), 201
 
 
-
 @app.route('/meals', methods=['GET'])
 def all_meals_get():
-
     # all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
     # all_meals_json_dict = json.loads(all_meals_json_str)
 
@@ -222,8 +237,8 @@ def all_meals_get():
         diet_filter_meals = []
         for meal in all_meals_json_array:
             if meal.meal.cal <= diet_from_service.get('cal') \
-            and meal.meal.sodium <= diet_from_service.get('sodium') \
-            and meal.meal.sugar <= diet_from_service.get('sugar'):
+                    and meal.meal.sodium <= diet_from_service.get('sodium') \
+                    and meal.meal.sugar <= diet_from_service.get('sugar'):
                 diet_filter_meals.append(meal)
 
         return json.dumps(diet_filter_meals, cls=MealEncoder), 200
@@ -233,13 +248,13 @@ def all_meals_get():
 
 @app.route('/meals/<int:id>', methods=['GET'])
 def meals_id_get(id):
-
     requested_meal = all_meals.meals.get(id)
 
     if requested_meal is None:
         return jsonify(-5), 404
 
     return jsonify(requested_meal.asdict()), 200
+
 
 @app.route('/meals/', methods=['GET'])
 def meals_get_not_specified():
@@ -254,13 +269,16 @@ def meals_id_delete(id):
     all_meals.remove_meal_by_id(id)
     return jsonify(id), 200
 
+
 @app.route('/meals/', methods=['DELETE'])
 def meals_delete_not_specified():
     return jsonify(-1), 400
 
+
 @app.route('/meals', methods=['DELETE'])
 def all_meals_delete():
     return jsonify(-1), 400
+
 
 @app.route('/meals/<int:id>', methods=['PUT'])
 def meals_id_put(id):
@@ -287,9 +305,15 @@ def meals_id_put(id):
 
     # updates the meal
     requested_meal.update_meal(new_meal_name, new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
+    meals_collection.update_one({"_id": id}, {"$set": {"name": new_meal_name,
+                                                       "appetizer": new_meal_appetizer_id,
+                                                       "main": new_meal_main_id,
+                                                       "dessert": new_meal_dessert_id,
+                                                       "cal": requested_meal.cal,
+                                                       "sodium": requested_meal.sodium,
+                                                       "sugar": requested_meal.sugar}})
 
     return jsonify(id), 200
-
 
 
 @app.route('/meals/<name>', methods=['GET'])
@@ -304,13 +328,13 @@ def meals_name_get(name):
 
 @app.route('/meals/<name>', methods=['DELETE'])
 def meals_name_delete(name):
-
     for key, value in all_meals.meals.items():
         if value.name == name:
             all_meals.remove_meal_by_id(key)
             return jsonify(key), 200
 
     return jsonify(-5), 404
+
 
 # meals endpoint return meal id -done
 #

@@ -2,9 +2,9 @@ from flask.json import JSONEncoder
 from dishes import all_dishes
 
 class Meal:
-    def __init__(self, name: str, ID: int,appetizer: int, main: int,dessert: int,cal: int,sodium: int,sugar: int) :
+    def __init__(self, name: str, _id: int,appetizer: int, main: int,dessert: int,cal: int,sodium: int,sugar: int) :
         self.name = name
-        self.ID = ID
+        self._id = _id
         self.appetizer = appetizer
         self.main = main
         self.dessert = dessert
@@ -39,7 +39,7 @@ class Meal:
 
 
     def asdict(self):
-        return {'name': self.name, 'ID': self.ID,
+        return {'name': self.name, '_id': self._id,
                 'appetizer': self.appetizer, 'main': self.main, 'dessert': self.dessert,
                 'cal': self.cal, 'sodium': self.sodium, 'sugar': self.sugar}
 

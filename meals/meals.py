@@ -32,7 +32,7 @@ class Meals:
         meal_array_to_return = []
 
         for meal_id, meal_object in self.meals.items():
-            meal_array_to_return.append({"_id": meal_id, "meal": meal_object})
+            meal_array_to_return.append(meal_object.asdict())
 
         return meal_array_to_return
 
