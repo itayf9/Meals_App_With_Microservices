@@ -7,7 +7,7 @@ class Dishes:
         self.dish_counter = 1
 
     def add_dish(self, dish: Dish):
-        self.dishes.update({dish.ID: dish})
+        self.dishes.update({dish._id: dish})
 
     def convert_dictionary_to_array(self):
         dish_array_to_return = []

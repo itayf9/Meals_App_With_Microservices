@@ -7,7 +7,7 @@ class Meals:
         self.meal_counter = 1
 
     def add_meal(self, meal: Meal):
-        self.meals.update({meal.ID: meal})
+        self.meals.update({meal._id: meal})
 
     def create_new_meal_from_dishes(self, new_meal_name, new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id):
         # fetches the dishes from all dishes map

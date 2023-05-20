@@ -110,7 +110,8 @@ def all_dishes_post():
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
     # add the dish to the list
     all_dishes.add_dish(new_dish)
-    return jsonify(new_dish.ID), 201
+    dishes_collection.insert_one(new_dish)
+    return jsonify(new_dish._id), 201
 
 
 @app.route('/dishes/', methods=['DELETE'])
@@ -149,6 +150,7 @@ def dishes_id_delete(id):
         if key == id:
             # delete the dish from the dishes list
             all_dishes.remove_dish_by_id(key)
+            dishes_collection.delete_one({'_id:': key})
             return jsonify(id), 200
 
     return jsonify(-5), 404
@@ -175,6 +177,7 @@ def dishes_name_delete(name):
         if value.name == name:
             # delete the dish from the dishes list
             all_dishes.remove_dish_by_id(key)
+            dishes_collection.delete_one({'name:': name})
             return jsonify(key), 200
 
     return jsonify(-5), 404
@@ -219,8 +222,8 @@ def all_meals_post():
                                                      new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
 
     all_meals.add_meal(new_meal)
-
-    return jsonify(new_meal.ID), 201
+    meals_collection.insert_one(new_meal)
+    return jsonify(new_meal._id), 201
 
 
 @app.route('/meals', methods=['GET'])
@@ -267,6 +270,7 @@ def meals_id_delete(id):
     if requested_meal is None:
         return jsonify(-5), 404
     all_meals.remove_meal_by_id(id)
+    meals_collection.delete_one({'_id:': id})
     return jsonify(id), 200
 
 
@@ -318,7 +322,6 @@ def meals_id_put(id):
 
 @app.route('/meals/<name>', methods=['GET'])
 def meals_name_get(name):
-
     for key, value in all_meals.meals.items():
         if value.name == name:
             return jsonify(value.asdict()), 200
@@ -331,6 +334,7 @@ def meals_name_delete(name):
     for key, value in all_meals.meals.items():
         if value.name == name:
             all_meals.remove_meal_by_id(key)
+            meals_collection.delete_one({'name:': name})
             return jsonify(key), 200
 
     return jsonify(-5), 404
