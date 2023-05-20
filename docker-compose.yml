@@ -19,12 +19,14 @@ services:
     depends_on:
       - mongo
 
-#  diet-service:
-#    build: ./diets  # path is relative to docker-compose-shorthand.yml location
-#    ports:
-#      - "5002:80"  # host:container
-#    depends_on:
-#      - mongo
+  diet-service:
+    build: ./diets  # path is relative to docker-compose-shorthand.yml location
+    ports:
+      - "5002:80"  # host:container
+    expose:
+      - 80
+    depends_on:
+      - mongo
 
   mongo:
     image: mongo

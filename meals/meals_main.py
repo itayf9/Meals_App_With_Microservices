@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request, json
 
 from config import ninja_api_key
 from dish import DishEncoder, Dish
-from meal import MealEncoder
+from meal import MealEncoder, Meal
 
 from dishes import all_dishes
 from meals import all_meals
@@ -25,14 +25,14 @@ dishes_collection = db["dishes"]
 dishes_list_from_db = list(dishes_collection.find())
 max_id_number = 0
 for dish_from_db in dishes_list_from_db:
-    all_dishes.add_dish(dish_from_db)
+    all_dishes.add_dish(Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"), dish_from_db.get("sodium"), dish_from_db.get("sugar")))
     max_id_number = max(max_id_number, dish_from_db.get("_id"))
 all_dishes.dish_counter = max_id_number + 1
 
 meals_list_from_db = list(meals_collection.find())
 max_id_number = 0
 for meal_from_db in meals_list_from_db:
-    all_meals.add_meal(meal_from_db)
+    all_meals.add_meal(Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"), meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"), meal_from_db.get("sodium"), meal_from_db.get("sugar")))
     max_id_number = max(max_id_number, meal_from_db.get("_id"))
 all_meals.meal_counter = max_id_number + 1
 
@@ -110,7 +110,7 @@ def all_dishes_post():
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
     # add the dish to the list
     all_dishes.add_dish(new_dish)
-    dishes_collection.insert_one(new_dish)
+    dishes_collection.insert_one(new_dish.asdict())
     return jsonify(new_dish._id), 201
 
 
@@ -222,7 +222,7 @@ def all_meals_post():
                                                      new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
 
     all_meals.add_meal(new_meal)
-    meals_collection.insert_one(new_meal)
+    meals_collection.insert_one(new_meal.asdict())
     return jsonify(new_meal._id), 201
 
 
@@ -236,15 +236,23 @@ def all_meals_get():
     diet_from_query_parameter = request.args.get('diet')
     if diet_from_query_parameter is not None:
         # fetches diet from diet service
-        diet_from_service = {}
+        api_url = 'http://diet-service:80/diets/{}'.format(diet_from_query_parameter)
+        response = requests.get(api_url)
+
+        if response.status_code == 404:
+            pass
+
+        diet_from_service = response.json()
+
         diet_filter_meals = []
         for meal in all_meals_json_array:
-            if meal.meal.cal <= diet_from_service.get('cal') \
-                    and meal.meal.sodium <= diet_from_service.get('sodium') \
-                    and meal.meal.sugar <= diet_from_service.get('sugar'):
+            if meal.get("cal") <= diet_from_service.get('cal') \
+                    and meal.get("sodium") <= diet_from_service.get('sodium') \
+                    and meal.get("sugar") <= diet_from_service.get('sugar'):
                 diet_filter_meals.append(meal)
 
-        return json.dumps(diet_filter_meals, cls=MealEncoder), 200
+        # return json.dumps(diet_filter_meals, cls=MealEncoder), 200
+        return jsonify(diet_filter_meals), 200
 
     return json.dumps(all_meals_json_array, cls=MealEncoder), 200
 
