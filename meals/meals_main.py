@@ -17,7 +17,7 @@ app = Flask(__name__)
 # api = Api(app)
 
 client = pymongo.MongoClient("mongodb://mongo:27017/")
-db = client["mealsdb"]
+db = client["food_planner_db"]
 meals_collection = db["meals"]
 dishes_collection = db["dishes"]
 
@@ -75,7 +75,7 @@ def all_dishes_get():
 
     all_dishes_json_array = all_dishes.convert_dictionary_to_array()
 
-    return json.dumps(all_dishes_json_array, cls=DishEncoder), 200
+    return jsonify(all_dishes_json_array), 200
 
 
 @app.route('/dishes', methods=['POST'])
@@ -254,7 +254,7 @@ def all_meals_get():
         # return json.dumps(diet_filter_meals, cls=MealEncoder), 200
         return jsonify(diet_filter_meals), 200
 
-    return json.dumps(all_meals_json_array, cls=MealEncoder), 200
+    return jsonify(all_meals_json_array), 200
 
 
 @app.route('/meals/<int:id>', methods=['GET'])
