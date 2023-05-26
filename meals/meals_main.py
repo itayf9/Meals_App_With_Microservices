@@ -4,8 +4,8 @@ from flask import Flask, jsonify, request, json
 # from flask_restful import Resource, Api, reqparse
 
 from config import ninja_api_key
-from dish import DishEncoder, Dish
-from meal import MealEncoder, Meal
+from dish import Dish
+from meal import Meal
 
 from dishes import all_dishes
 from meals import all_meals

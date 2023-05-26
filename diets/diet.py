@@ -1,4 +1,4 @@
-from flask.json import JSONEncoder
+# from flask.json import JSONEncoder
 
 
 class Diet:

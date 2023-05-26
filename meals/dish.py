@@ -1,4 +1,4 @@
-from flask.json import JSONEncoder
+# from flask.json import JSONEncoder
 
 
 class Dish:
@@ -11,11 +11,11 @@ class Dish:
         self.sugar = sugar
 
     def asdict(self):
-        return {'name': self.name, '_id': self._id, 'cal': self.cal, 'sodium': self.sodium, 'size': self.size, 'sugar': self.sugar}
+        return {'name': self.name, '_id': self._id, 'ID': self.ID, 'cal': self.cal, 'sodium': self.sodium, 'size': self.size, 'sugar': self.sugar}
 
 
 
-class DishEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+# class DishEncoder(JSONEncoder):
+#     def default(self, o):
+#         return o.__dict__
 
