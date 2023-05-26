@@ -5,6 +5,7 @@ class Meal:
     def __init__(self, name: str, _id: int, appetizer: int, main: int, dessert: int, cal: int, sodium: int, sugar: int):
         self.name = name
         self._id = _id
+        self.ID = str(_id)
         self.appetizer = appetizer
         self.main = main
         self.dessert = dessert
