@@ -7,8 +7,8 @@ from config import ninja_api_key
 from dish import Dish
 from meal import Meal
 
-from dishes import all_dishes
-from meals import all_meals
+from dishes import all_dishes, Dishes
+from meals import all_meals, Meals
 
 import pymongo
 
@@ -150,7 +150,7 @@ def dishes_id_delete(id):
         if key == id:
             # delete the dish from the dishes list
             all_dishes.remove_dish_by_id(key)
-            dishes_collection.delete_one({'_id:': key})
+            dishes_collection.delete_one({'_id': key})
             return jsonify(id), 200
 
     return jsonify(-5), 404
@@ -177,7 +177,7 @@ def dishes_name_delete(name):
         if value.name == name:
             # delete the dish from the dishes list
             all_dishes.remove_dish_by_id(key)
-            dishes_collection.delete_one({'name:': name})
+            dishes_collection.delete_one({'name': name})
             return jsonify(key), 200
 
     return jsonify(-5), 404
@@ -278,7 +278,7 @@ def meals_id_delete(id):
     if requested_meal is None:
         return jsonify(-5), 404
     all_meals.remove_meal_by_id(id)
-    meals_collection.delete_one({'_id:': id})
+    meals_collection.delete_one({'_id': id})
     return jsonify(id), 200
 
 
@@ -342,7 +342,7 @@ def meals_name_delete(name):
     for key, value in all_meals.meals.items():
         if value.name == name:
             all_meals.remove_meal_by_id(key)
-            meals_collection.delete_one({'name:': name})
+            meals_collection.delete_one({'name': name})
             return jsonify(key), 200
 
     return jsonify(-5), 404

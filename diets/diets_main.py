@@ -16,18 +16,22 @@ diets_collection = db["diets"]
 
 all_diets = []
 
+def update_all_diets_from_db():
+    global all_diets
+    all_diets = []
+    # defines the projection (fields to include/exclude)
+    projection = {'_id': 0, 'sugar': 1, 'cal': 1, 'sodium': 1, 'name': 1}
+
+    # finds documents and apply the projection
+    diets_list_from_db = list(diets_collection.find({}, projection))
+
+    # iterates over the results and adds them to the all_diets list
+    for diet_from_db in diets_list_from_db:
+        all_diets.append(Diet(diet_from_db.get("name"), diet_from_db.get("cal"), diet_from_db.get("sodium"),
+                              diet_from_db.get("sugar")))
+
 # initializes the meals and dished from DB
-# defines the projection (fields to include/exclude)
-projection = {'_id': 0, 'sugar': 1, 'cal': 1, 'sodium': 1, 'name': 1}
-
-# finds documents and apply the projection
-diets_list_from_db = list(diets_collection.find({}, projection))
-
-# iterates over the results and adds them to the all_diets list
-for diet_from_db in diets_list_from_db:
-    all_diets.append(Diet(diet_from_db.get("name"), diet_from_db.get("cal"), diet_from_db.get("sodium"), diet_from_db.get("sugar")))
-
-
+update_all_diets_from_db()
 
 def find_diet_in_all_diets_by_name(new_diet_name: str):
     global all_diets
@@ -71,11 +75,13 @@ def diets_post():
 @app.route('/diets', methods=['GET'])
 def diets_get():
     global all_diets
+    update_all_diets_from_db()
     return jsonify([diet.asdict() for diet in all_diets]), 200
 
 
 @app.route('/diets/<name>', methods=['GET'])
 def diets_name_get(name):
+    update_all_diets_from_db()
     existing_diet = find_diet_in_all_diets_by_name(name)
 
     if existing_diet is not None:
