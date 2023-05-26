@@ -68,14 +68,39 @@ all_meals.meal_counter = max_id_number + 1
 # all_meals = Meals()
 # all_dishes = Dishes()
 
+def update_dishes_from_db():
+    global all_dishes
+    all_dishes = Dishes()
+    dishes_list_from_db = list(dishes_collection.find())
+    max_id_number = 0
+    for dish_from_db in dishes_list_from_db:
+        all_dishes.add_dish(
+            Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"),
+                 dish_from_db.get("sodium"), dish_from_db.get("sugar")))
+        max_id_number = max(max_id_number, dish_from_db.get("_id"))
+    all_dishes.dish_counter = max_id_number + 1
+
+def update_all_meals_from_db():
+    global all_meals
+    all_meals = Meals()
+    meals_list_from_db = list(meals_collection.find())
+    max_id_number = 0
+    for meal_from_db in meals_list_from_db:
+        all_meals.add_meal(Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"),
+                                meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"),
+                                meal_from_db.get("sodium"), meal_from_db.get("sugar")))
+        max_id_number = max(max_id_number, meal_from_db.get("_id"))
+    all_meals.meal_counter = max_id_number + 1
+
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
+    update_dishes_from_db()
     # all_dishes_json_str = json.dumps(all_dishes.dishes, cls=DishEncoder)
     # all_dishes_json_dict = json.loads(all_dishes_json_str)
-
     all_dishes_json_array = all_dishes.convert_dictionary_to_array()
 
     return jsonify(all_dishes_json_array), 200
+
 
 
 @app.route('/dishes', methods=['POST'])
@@ -83,7 +108,6 @@ def all_dishes_post():
     # checks the content type of the request
     if request.content_type != "application/json":
         return jsonify(0), 415
-
     # fetches the dish name
     json_new_dish_name_data = request.json
     new_dish_name = json_new_dish_name_data.get('name')
@@ -121,6 +145,7 @@ def dishes_not_specified_delete():
 
 @app.route('/dishes/', methods=['GET'])
 def dishes_not_specified_get():
+    update_dishes_from_db()
     return all_dishes_get()
 
 
@@ -131,6 +156,7 @@ def all_dishes_delete():
 
 @app.route('/dishes/<int:id>', methods=['GET'])
 def dishes_id_get(id):
+    update_dishes_from_db()
     if id is None:
         return jsonify(-1), 400
 
@@ -139,6 +165,7 @@ def dishes_id_get(id):
             return jsonify(value.asdict()), 200
 
     return jsonify(-5), 404
+
 
 
 @app.route('/dishes/<int:id>', methods=['DELETE'])
@@ -158,6 +185,7 @@ def dishes_id_delete(id):
 
 @app.route('/dishes/<name>', methods=['GET'])
 def dishes_name_get(name):
+    update_dishes_from_db()
     if name is None:
         return jsonify(-1), 400
 
@@ -191,6 +219,7 @@ def all_meals_post():
     # "dessert": "13"}
 
     # checks the content type of the request
+    update_all_meals_from_db()
     if request.content_type != "application/json":
         return jsonify(0), 415
     json_meals_data = request.json
@@ -230,7 +259,7 @@ def all_meals_post():
 def all_meals_get():
     # all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
     # all_meals_json_dict = json.loads(all_meals_json_str)
-
+    update_all_meals_from_db()
     all_meals_json_array = all_meals.convert_dictionary_to_array()
 
     diet_from_query_parameter = request.args.get('diet')
@@ -259,6 +288,7 @@ def all_meals_get():
 
 @app.route('/meals/<int:id>', methods=['GET'])
 def meals_id_get(id):
+    update_all_meals_from_db()
     requested_meal = all_meals.meals.get(id)
 
     if requested_meal is None:
@@ -269,6 +299,7 @@ def meals_id_get(id):
 
 @app.route('/meals/', methods=['GET'])
 def meals_get_not_specified():
+    update_all_meals_from_db()
     return all_meals_get()
 
 
@@ -330,6 +361,7 @@ def meals_id_put(id):
 
 @app.route('/meals/<name>', methods=['GET'])
 def meals_name_get(name):
+    update_all_meals_from_db()
     for key, value in all_meals.meals.items():
         if value.name == name:
             return jsonify(value.asdict()), 200
