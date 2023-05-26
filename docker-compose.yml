@@ -28,6 +28,14 @@ services:
     depends_on:
       - mongo
 
+  reverse:
+    build: ./nginx
+    ports:
+      - "80:80"  # host:container
+    depends_on:
+      - meal-service
+      - diet-service
+
   mongo:
     image: mongo
 #    environment:
