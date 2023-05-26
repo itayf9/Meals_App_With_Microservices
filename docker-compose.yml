@@ -3,7 +3,7 @@ version: '3'  # version of compose format
 services:
   meal-service:
     build: ./meals  # path is relative to docker-compose-shorthand.yml location
-#    restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
+    restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
 #    volumes:
 #      - type: bind
 #        source: ./app #host directory
@@ -21,6 +21,7 @@ services:
 
   diet-service:
     build: ./diets  # path is relative to docker-compose-shorthand.yml location
+    restart: always
     ports:
       - "5002:80"  # host:container
     expose:
