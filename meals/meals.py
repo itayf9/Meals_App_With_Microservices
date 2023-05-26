@@ -1,5 +1,7 @@
 from dishes import all_dishes
 from meal import Meal
+from dish import Dish
+
 
 class Meals:
     def __init__(self):
@@ -38,6 +40,24 @@ class Meals:
 
     def remove_meal_by_id(self, mealID: int):
         self.meals.pop(mealID)
+
+    def remove_the_deleted_dish_from_all_meals_that_contains_it(self, id_of_dish_to_remove: int, dish_to_remove: Dish):
+        for key, value in self.meals.items():
+            if value.appetizer == id_of_dish_to_remove:
+                value.appetizer = None
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+            if value.main == id_of_dish_to_remove:
+                value.main = None
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+            if value.dessert == id_of_dish_to_remove:
+                value.dessert = None
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+
+
+    def remove_cal_sodium_sugar_from_meal(self, meal : Meal, cal: float, sodium: float, sugar: float):
+        meal.cal -= cal
+        meal.sodium -= sodium
+        meal.sugar -= sugar
 
 
 all_meals = Meals()
