@@ -5,6 +5,7 @@ from meal import Meal
 from dish import Dish
 
 
+
 class Meals:
     def __init__(self):
         self.meals = {}
