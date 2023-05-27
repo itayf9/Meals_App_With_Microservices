@@ -19,6 +19,7 @@ services:
     depends_on:
       - mongo
 
+
   diet-service:
     build: ./diets  # path is relative to docker-compose-shorthand.yml location
     restart: always
