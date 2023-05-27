@@ -1,3 +1,5 @@
+from pymongo.collection import Collection
+
 from dishes import all_dishes
 from meal import Meal
 from dish import Dish
@@ -41,8 +43,9 @@ class Meals:
     def remove_meal_by_id(self, mealID: int):
         self.meals.pop(mealID)
 
-    def remove_the_deleted_dish_from_all_meals_that_contains_it(self, id_of_dish_to_remove: int, dish_to_remove: Dish):
+    def remove_the_deleted_dish_from_all_meals_that_contains_it(self, id_of_dish_to_remove: int, dish_to_remove: Dish, meals_collection: Collection):
         for key, value in self.meals.items():
+            print("meal {0} before removing: {1}".format(key, str(value.asdict())), flush=True)
             if value.appetizer == id_of_dish_to_remove:
                 value.appetizer = None
                 self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
@@ -52,6 +55,15 @@ class Meals:
             if value.dessert == id_of_dish_to_remove:
                 value.dessert = None
                 self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+            print("meal {0} after removing: {1}".format(key, str(value.asdict())), flush=True)
+
+            meals_collection.update_one({"_id": key}, {"$set": {"appetizer": value.appetizer,
+                                                                                 "main": value.main,
+                                                                                 "dessert": value.dessert,
+                                                                                 "cal": value.cal,
+                                                                                 "sodium": value.sodium,
+                                                                                 "sugar": value.sugar}})
+            print("meal {0} updated in db: {1}".format(key, str(value.asdict())), flush=True)
 
 
     def remove_cal_sodium_sugar_from_meal(self, meal : Meal, cal: float, sodium: float, sugar: float):

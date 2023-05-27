@@ -176,13 +176,9 @@ def dishes_id_delete(id):
     for key, value in all_dishes.dishes.items():
         if key == id:
             # delete the dish from the dishes list
-            all_meals.remove_the_deleted_dish_from_all_meals_that_contains_it(id, value)
-            meals_collection.update_one({"_id": id}, {"$set": {"appetizer": value.appetizer,
-                                                               "main": value.main,
-                                                               "dessert": value.dessert,
-                                                               "cal": value.cal,
-                                                               "sodium": value.sodium,
-                                                               "sugar": value.sugar}})
+            print("about to delete  id: {0}, value : {1}".format(key, str(value.asdict())), flush= True)
+            all_meals.remove_the_deleted_dish_from_all_meals_that_contains_it(id, value, meals_collection)
+
             all_dishes.remove_dish_by_id(key)
             dishes_collection.delete_one({'_id': key})
             return jsonify(id), 200
@@ -211,13 +207,8 @@ def dishes_name_delete(name):
     for key, value in all_dishes.dishes.items():
         if value.name == name:
             # delete the dish from the dishes list
-            all_meals.remove_the_deleted_dish_from_all_meals_that_contains_it(key, value)
-            meals_collection.update_one({"_id": key}, {"$set": {"appetizer": value.appetizer,
-                                                                "main": value.main,
-                                                                "dessert": value.dessert,
-                                                                "cal": value.cal,
-                                                                "sodium": value.sodium,
-                                                                "sugar": value.sugar}})
+            all_meals.remove_the_deleted_dish_from_all_meals_that_contains_it(key, value, meals_collection)
+
             all_dishes.remove_dish_by_id(key)
             dishes_collection.delete_one({'name': name})
             return jsonify(key), 200
@@ -283,7 +274,7 @@ def all_meals_get():
         response = requests.get(api_url)
 
         if response.status_code == 404:
-            pass
+            return response.text, 404
 
         diet_from_service = response.json()
 
