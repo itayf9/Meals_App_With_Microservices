@@ -33,6 +33,15 @@ else:
     result = dish_counter.find_one({"counter_id": 0})["cur_key"]
     all_dishes.dish_counter = result - 1
 
+if meal_counter.find_one({"counter_id": 0}) is None:  # first time starting up this service as no document with _id ==0 exists
+    # insert a document into the database to have one "_id" index that starts at 0 and a field named "cur_key"
+    meal_counter.insert_one({"counter_id": 0, "cur_key": 1})
+    print("########counter id 0 is None",flush = True)
+else:
+    result = meal_counter.find_one({"counter_id": 0})["cur_key"]
+    all_meals.meal_counter = result - 1
+
+
 
 # initializes the meals and dished from DB
 dishes_list_from_db = list(dishes_collection.find())
@@ -68,7 +77,7 @@ def update_all_meals_from_db():
         all_meals.add_meal(Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"),
                                 meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"),
                                 meal_from_db.get("sodium"), meal_from_db.get("sugar")))
-        max_id_number = max(max_id_number, meal_from_db.get("_id"))
+    all_meals.meal_counter = meal_counter.find_one({"counter_id": 0})["cur_key"]
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
@@ -117,7 +126,6 @@ def all_dishes_post():
     cur_key = dish_counter.find_one(docID)["cur_key"] + 1
     # set the "cur_key" field of the doc that meets the docID constraint to the updated value cur_key
     dish_counter.update_one(docID, {"$set": {"cur_key": cur_key}})
-    print("###############id number is",cur_key)
     dishes_collection.insert_one(new_dish.asdict())
     return jsonify(new_dish._id), 201
 
@@ -235,10 +243,12 @@ def all_meals_post():
             or not new_meal_main_id in all_dishes.dishes \
             or not new_meal_dessert_id in all_dishes.dishes:
         return jsonify(-5), 400
-
+    docID = {"counter_id": 0}
+    cur_key = meal_counter.find_one(docID)["cur_key"] + 1
+    # set the "cur_key" field of the doc that meets the docID constraint to the updated value cur_key
+    meal_counter.update_one(docID, {"$set": {"cur_key": cur_key}})
     new_meal = all_meals.create_new_meal_from_dishes(new_meal_name,
                                                      new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
-
     all_meals.add_meal(new_meal)
     meals_collection.insert_one(new_meal.asdict())
     return jsonify(new_meal._id), 201
