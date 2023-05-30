@@ -20,53 +20,33 @@ client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client["food_planner_db"]
 meals_collection = db["meals"]
 dishes_collection = db["dishes"]
+dish_counter = db["dish-counter"]
+meal_counter = db["meals-counter"]
+
+# check if this is the first time starting up; i.e., do we already have a record with _id == 0 in the collection or not.
+# If it does, do nothing.  if not, initialize
+if dish_counter.find_one({"counter_id": 0}) is None:  # first time starting up this service as no document with _id ==0 exists
+    # insert a document into the database to have one "_id" index that starts at 0 and a field named "cur_key"
+    dish_counter.insert_one({"counter_id": 0, "cur_key": 1})
+    print("########counter id 0 is None",flush = True)
+else:
+    result = dish_counter.find_one({"counter_id": 0})["cur_key"]
+    all_dishes.dish_counter = result - 1
+
 
 # initializes the meals and dished from DB
 dishes_list_from_db = list(dishes_collection.find())
 max_id_number = 0
 for dish_from_db in dishes_list_from_db:
     all_dishes.add_dish(Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"), dish_from_db.get("sodium"), dish_from_db.get("sugar")))
-    max_id_number = max(max_id_number, dish_from_db.get("_id"))
-all_dishes.dish_counter = max_id_number + 1
+    max_id_number = dish_counter.find_one({"counter_id": 0})["cur_key"]
 
 meals_list_from_db = list(meals_collection.find())
 max_id_number = 0
 for meal_from_db in meals_list_from_db:
     all_meals.add_meal(Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"), meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"), meal_from_db.get("sodium"), meal_from_db.get("sugar")))
     max_id_number = max(max_id_number, meal_from_db.get("_id"))
-all_meals.meal_counter = max_id_number + 1
 
-
-# counter = 3
-
-# @app.route('/test', methods=['POST'])
-# def test1():
-#     global counter
-#     json_new_dish_name_data = request.json
-#     new_dish_name = json_new_dish_name_data.get('name')
-#
-#     new_dish = Dish(new_dish_name, counter, 0, 0, 0, 0)
-#
-#     meals_collection.insert_one({"_id": counter, "dish": new_dish.asdict()})
-#     counter += 1
-#     return jsonify(), 200
-#
-#
-# @app.route('/test', methods=['GET'])
-# def test2():
-#     dish = meals_collection.find_one({"_id": 0})
-#
-#     return jsonify(dish), 200
-#
-# @app.route('/testAll', methods=['GET'])
-# def test3():
-#     cursor = meals_collection.find()
-#     cursor_list = list(cursor)
-#
-#     return jsonify(cursor_list), 200
-
-# all_meals = Meals()
-# all_dishes = Dishes()
 
 def update_dishes_from_db():
     global all_dishes
@@ -77,8 +57,7 @@ def update_dishes_from_db():
         all_dishes.add_dish(
             Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"),
                  dish_from_db.get("sodium"), dish_from_db.get("sugar")))
-        max_id_number = max(max_id_number, dish_from_db.get("_id"))
-    all_dishes.dish_counter = max_id_number + 1
+    all_dishes.dish_counter = dish_counter.find_one({"counter_id": 0})["cur_key"]
 
 def update_all_meals_from_db():
     global all_meals
@@ -90,7 +69,6 @@ def update_all_meals_from_db():
                                 meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"),
                                 meal_from_db.get("sodium"), meal_from_db.get("sugar")))
         max_id_number = max(max_id_number, meal_from_db.get("_id"))
-    all_meals.meal_counter = max_id_number + 1
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
@@ -106,6 +84,7 @@ def all_dishes_get():
 @app.route('/dishes', methods=['POST'])
 def all_dishes_post():
     # checks the content type of the request
+    update_dishes_from_db()
     if request.content_type != "application/json":
         return jsonify(0), 415
     # fetches the dish name
@@ -134,6 +113,11 @@ def all_dishes_post():
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
     # add the dish to the list
     all_dishes.add_dish(new_dish)
+    docID = {"counter_id": 0}
+    cur_key = dish_counter.find_one(docID)["cur_key"] + 1
+    # set the "cur_key" field of the doc that meets the docID constraint to the updated value cur_key
+    dish_counter.update_one(docID, {"$set": {"cur_key": cur_key}})
+    print("###############id number is",cur_key)
     dishes_collection.insert_one(new_dish.asdict())
     return jsonify(new_dish._id), 201
 

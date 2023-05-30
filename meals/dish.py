@@ -11,7 +11,6 @@ class Dish:
         self.size = size
         self.sugar = sugar
 
-
     def asdict(self):
         return {'name': self.name, '_id': self._id, 'ID': self.ID, 'cal': self.cal, 'sodium': self.sodium, 'size': self.size, 'sugar': self.sugar}
 
