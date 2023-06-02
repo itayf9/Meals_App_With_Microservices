@@ -55,6 +55,7 @@ services:
       - "80:80"  # host:container
     depends_on:
       - meal-service
+      - meal-service-2
       - diet-service
 
   mongo:

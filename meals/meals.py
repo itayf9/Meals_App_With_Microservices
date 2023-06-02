@@ -20,12 +20,12 @@ class Meals:
         appetizer = all_dishes.dishes.get(new_meal_appetizer_id)
         main = all_dishes.dishes.get(new_meal_main_id)
         dessert = all_dishes.dishes.get(new_meal_dessert_id)
+        print(all_dishes.dishes,flush=True)
 
         # calculates the calories, sodium and sugar of the meal
         cal = appetizer.cal + main.cal + dessert.cal
         sodium = appetizer.sodium + main.sodium + dessert.sodium
         sugar = appetizer.sugar + main.sugar + dessert.sugar
-
         new_meal = Meal(new_meal_name, self.meal_counter,
                         new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id,
                         cal, sodium, sugar)
