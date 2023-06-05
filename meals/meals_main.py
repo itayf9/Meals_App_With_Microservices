@@ -50,7 +50,7 @@ for dish_from_db in dishes_list_from_db:
     all_dishes.add_dish(
         Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"),
              dish_from_db.get("sodium"), dish_from_db.get("sugar")))
-    #max_id_number = dish_counter.find_one({"counter_id": 0})["cur_key"]
+    # max_id_number = dish_counter.find_one({"counter_id": 0})["cur_key"]
 
 meals_list_from_db = list(meals_collection.find())
 max_id_number = 0
@@ -59,7 +59,7 @@ for meal_from_db in meals_list_from_db:
         Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"), meal_from_db.get("main"),
              meal_from_db.get("dessert"), meal_from_db.get("cal"), meal_from_db.get("sodium"),
              meal_from_db.get("sugar")))
-    #max_id_number = max(max_id_number, meal_from_db.get("_id"))
+    # max_id_number = max(max_id_number, meal_from_db.get("_id"))
 
 
 def update_dishes_from_db():
@@ -240,10 +240,11 @@ def all_meals_post():
         if meal.name == new_meal_name:
             return jsonify(-2), 400
 
+
     # checks if all the dishes exist
-    if not new_meal_dessert_id in all_dishes.dishes \
-            or not new_meal_main_id in all_dishes.dishes \
-            or not new_meal_dessert_id in all_dishes.dishes:
+    if new_meal_appetizer_id not in all_dishes.dishes.keys() \
+            or new_meal_main_id not in all_dishes.dishes.keys() or \
+            new_meal_dessert_id not in all_dishes.dishes.keys():
         return jsonify(-5), 400
     new_meal = all_meals.create_new_meal_from_dishes(new_meal_name,
                                                      new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
