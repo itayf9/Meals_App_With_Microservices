@@ -327,6 +327,8 @@ def all_meals_delete():
 def meals_id_put(id):
     update_all_meals_from_db()
     requested_meal = all_meals.meals.get(id)
+    if requested_meal is None:
+        return jsonify(-1), 400
 
     # checks the content type of the request
     if request.content_type != "application/json":
@@ -346,6 +348,17 @@ def meals_id_put(id):
             or new_meal_dessert_id is None:
         # the parameter name or appetizer or main or dessert is incorrect or missing
         return jsonify(-1), 400
+
+    # checks if the 'name' doesn't exist in all_meals
+    for meal_id, meal_object in all_meals.meals.items():
+        if id != meal_id and new_meal_name == meal_object.name:
+            return jsonify(-2), 400
+
+    # checks if the 'appetizer', 'main', 'dessert' exist in all_dishes
+    if new_meal_appetizer_id not in all_dishes.dishes.keys() \
+            or new_meal_main_id not in all_dishes.dishes.keys() \
+            or new_meal_dessert_id not in all_dishes.dishes.keys():
+        return jsonify(-5), 400
 
     # updates the meal
     requested_meal.update_meal(new_meal_name, new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
