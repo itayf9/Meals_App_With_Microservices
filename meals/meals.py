@@ -5,7 +5,6 @@ from meal import Meal
 from dish import Dish
 
 
-
 class Meals:
     def __init__(self):
         self.meals = {}
@@ -20,7 +19,6 @@ class Meals:
         appetizer = all_dishes.dishes.get(new_meal_appetizer_id)
         main = all_dishes.dishes.get(new_meal_main_id)
         dessert = all_dishes.dishes.get(new_meal_dessert_id)
-        print(all_dishes.dishes,flush=True)
 
         # calculates the calories, sodium and sugar of the meal
         cal = appetizer.cal + main.cal + dessert.cal
@@ -41,33 +39,33 @@ class Meals:
 
         return meal_array_to_return
 
-    def remove_meal_by_id(self, mealID: int):
-        self.meals.pop(mealID)
+    def remove_meal_by_id(self, meal_id: int):
+        self.meals.pop(meal_id)
 
-    def remove_the_deleted_dish_from_all_meals_that_contains_it(self, id_of_dish_to_remove: int, dish_to_remove: Dish, meals_collection: Collection):
+    def remove_the_deleted_dish_from_all_meals_that_contains_it(self, id_of_dish_to_remove: int, dish_to_remove: Dish,
+                                                                meals_collection: Collection):
         for key, value in self.meals.items():
-            print("meal {0} before removing: {1}".format(key, str(value.asdict())), flush=True)
             if value.appetizer == id_of_dish_to_remove:
                 value.appetizer = None
-                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium,
+                                                       dish_to_remove.sugar)
             if value.main == id_of_dish_to_remove:
                 value.main = None
-                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium,
+                                                       dish_to_remove.sugar)
             if value.dessert == id_of_dish_to_remove:
                 value.dessert = None
-                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium, dish_to_remove.sugar)
-            print("meal {0} after removing: {1}".format(key, str(value.asdict())), flush=True)
+                self.remove_cal_sodium_sugar_from_meal(value, dish_to_remove.cal, dish_to_remove.sodium,
+                                                       dish_to_remove.sugar)
 
             meals_collection.update_one({"_id": key}, {"$set": {"appetizer": value.appetizer,
-                                                                                 "main": value.main,
-                                                                                 "dessert": value.dessert,
-                                                                                 "cal": value.cal,
-                                                                                 "sodium": value.sodium,
-                                                                                 "sugar": value.sugar}})
-            print("meal {0} updated in db: {1}".format(key, str(value.asdict())), flush=True)
+                                                                "main": value.main,
+                                                                "dessert": value.dessert,
+                                                                "cal": value.cal,
+                                                                "sodium": value.sodium,
+                                                                "sugar": value.sugar}})
 
-
-    def remove_cal_sodium_sugar_from_meal(self, meal : Meal, cal: float, sodium: float, sugar: float):
+    def remove_cal_sodium_sugar_from_meal(self, meal: Meal, cal: float, sodium: float, sugar: float):
         meal.cal -= cal
         meal.sodium -= sodium
         meal.sugar -= sugar

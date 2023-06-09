@@ -1,7 +1,7 @@
+import os
+
 import requests
-import json
-from flask import Flask, jsonify, request, json
-# from flask_restful import Resource, Api, reqparse
+from flask import Flask, jsonify, request
 
 from config import ninja_api_key
 from dish import Dish
@@ -16,7 +16,9 @@ import pymongo
 app = Flask(__name__)
 # api = Api(app)
 
-client = pymongo.MongoClient("mongodb://mongo:27017/")
+port_for_mongo = os.environ.get("PORT_FOR_MONGO")
+
+client = pymongo.MongoClient("mongodb://mongo:{0}/".format(port_for_mongo))
 db = client["food_planner_db"]
 meals_collection = db["meals"]
 dishes_collection = db["dishes"]
@@ -29,7 +31,6 @@ if dish_counter.find_one(
         {"counter_id": 0}) is None:  # first time starting up this service as no document with _id ==0 exists
     # insert a document into the database to have one "_id" index that starts at 0 and a field named "cur_key"
     dish_counter.insert_one({"counter_id": 0, "cur_key": 1})
-    print("########counter id 0 is None", flush=True)
 else:
     result = dish_counter.find_one({"counter_id": 0})["cur_key"]
     all_dishes.dish_counter = result
@@ -38,7 +39,6 @@ if meal_counter.find_one(
         {"counter_id": 0}) is None:  # first time starting up this service as no document with _id ==0 exists
     # insert a document into the database to have one "_id" index that starts at 0 and a field named "cur_key"
     meal_counter.insert_one({"counter_id": 0, "cur_key": 1})
-    print("########counter id 0 is None", flush=True)
 else:
     result = meal_counter.find_one({"counter_id": 0})["cur_key"]
     all_meals.meal_counter = result
@@ -125,12 +125,12 @@ def all_dishes_post():
     new_dish = all_dishes.create_new_dish_from_ninja(new_dish_name, response.json())
     # add the dish to the list
     all_dishes.add_dish(new_dish)
-    docID = {"counter_id": 0}
-    cur_key = dish_counter.find_one(docID)["cur_key"] + 1
-    # set the "cur_key" field of the doc that meets the docID constraint to the updated value cur_key
-    dish_counter.update_one(docID, {"$set": {"cur_key": cur_key}})
+    document_id_of_counter = {"counter_id": 0}
+    cur_key = dish_counter.find_one(document_id_of_counter)["cur_key"] + 1
+    # set the "cur_key" field of the doc that meets the document_id_of_counter constraint to the updated value cur_key
+    dish_counter.update_one(document_id_of_counter, {"$set": {"cur_key": cur_key}})
     dishes_collection.insert_one(new_dish.asdict())
-    return jsonify(new_dish._id), 201
+    return jsonify(str(new_dish.ID)), 201
 
 
 @app.route('/dishes/', methods=['DELETE'])
@@ -170,12 +170,11 @@ def dishes_id_delete(id):
     for key, value in all_dishes.dishes.items():
         if key == id:
             # delete the dish from the dishes list
-            print("about to delete  id: {0}, value : {1}".format(key, str(value.asdict())), flush=True)
             all_meals.remove_the_deleted_dish_from_all_meals_that_contains_it(id, value, meals_collection)
 
             all_dishes.remove_dish_by_id(key)
             dishes_collection.delete_one({'_id': key})
-            return jsonify(id), 200
+            return jsonify(str(id)), 200
 
     return jsonify(-5), 404
 
@@ -205,7 +204,7 @@ def dishes_name_delete(name):
 
             all_dishes.remove_dish_by_id(key)
             dishes_collection.delete_one({'name': name})
-            return jsonify(key), 200
+            return jsonify(str(key)), 200
 
     return jsonify(-5), 404
 
@@ -226,7 +225,7 @@ def all_meals_post():
     new_meal_appetizer_id = json_meals_data.get('appetizer')
     new_meal_main_id = json_meals_data.get('main')
     new_meal_dessert_id = json_meals_data.get('dessert')
-    print(json_meals_data, flush=True)
+
     # checks if the 'name', 'appetizer', 'main', 'dessert' fields are specified
     if new_meal_name is None \
             or new_meal_appetizer_id is None \
@@ -240,7 +239,6 @@ def all_meals_post():
         if meal.name == new_meal_name:
             return jsonify(-2), 400
 
-
     # checks if all the dishes exist
     if new_meal_appetizer_id not in all_dishes.dishes.keys() \
             or new_meal_main_id not in all_dishes.dishes.keys() or \
@@ -248,13 +246,13 @@ def all_meals_post():
         return jsonify(-5), 400
     new_meal = all_meals.create_new_meal_from_dishes(new_meal_name,
                                                      new_meal_appetizer_id, new_meal_main_id, new_meal_dessert_id)
-    docID = {"counter_id": 0}
-    cur_key = meal_counter.find_one(docID)["cur_key"] + 1
-    # set the "cur_key" field of the doc that meets the docID constraint to the updated value cur_key
-    meal_counter.update_one(docID, {"$set": {"cur_key": cur_key}})
+    document_id_of_counter = {"counter_id": 0}
+    cur_key = meal_counter.find_one(document_id_of_counter)["cur_key"] + 1
+    # set the "cur_key" field of the doc that meets the document_id_of_counter constraint to the updated value cur_key
+    meal_counter.update_one(document_id_of_counter, {"$set": {"cur_key": cur_key}})
     all_meals.add_meal(new_meal)
     meals_collection.insert_one(new_meal.asdict())
-    return jsonify(new_meal._id), 201
+    return jsonify(new_meal.ID), 201
 
 
 @app.route('/meals', methods=['GET'])
@@ -271,7 +269,7 @@ def all_meals_get():
         response = requests.get(api_url)
 
         if response.status_code == 404:
-            return response.text, 404
+            return jsonify(response.json()), 404
 
         diet_from_service = response.json()
 
@@ -312,7 +310,7 @@ def meals_id_delete(id):
         return jsonify(-5), 404
     all_meals.remove_meal_by_id(id)
     meals_collection.delete_one({'_id': id})
-    return jsonify(id), 200
+    return jsonify(str(id)), 200
 
 
 @app.route('/meals/', methods=['DELETE'])
@@ -359,7 +357,7 @@ def meals_id_put(id):
                                                        "sodium": requested_meal.sodium,
                                                        "sugar": requested_meal.sugar}})
 
-    return jsonify(id), 200
+    return jsonify(str(id)), 200
 
 
 @app.route('/meals/<name>', methods=['GET'])
@@ -378,26 +376,9 @@ def meals_name_delete(name):
         if value.name == name:
             all_meals.remove_meal_by_id(key)
             meals_collection.delete_one({'name': name})
-            return jsonify(key), 200
+            return jsonify(str(key)), 200
 
     return jsonify(-5), 404
-
-
-# meals endpoint return meal id -done
-#
-# all return values should be int and not string -done
-#
-# handle dish with more than one igredient from ninja -done
-#
-# all meals endpoint
-#
-# fix response of get /dishs -done
-#
-# fix  get dishes/id not specified -done
-#
-# fix put meals/id when the meal with the id does not exist- no need
-#
-# fix duplicated dish added- happend once dont know why
 
 
 if __name__ == '__main__':

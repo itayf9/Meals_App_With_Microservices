@@ -4,44 +4,18 @@ services:
   meal-service:
     build: ./meals  # path is relative to docker-compose-shorthand.yml location
     restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
-#    volumes:
-#      - type: bind
-#        source: ./app #host directory
-#        target: /app # container directory
-#    environment:
-#      # tells flask run to run in development mode and reload the code on change. This mode should only be used in
-#      # development.
-#      FLASK_DEBUG: "true"
-##      MONGO_INITDB_ROOT_USERNAME: root
-##      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    environment:
+      PORT_FOR_MONGO: 27017
     ports:
       - "5001:80"  # host:container
     depends_on:
       - mongo
 
-  meal-service-2:
-    build: ./meals  # path is relative to docker-compose-shorthand.yml location
-    restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
-#    volumes:
-#      - type: bind
-#        source: ./app #host directory
-#        target: /app # container directory
-#    environment:
-#      # tells flask run to run in development mode and reload the code on change. This mode should only be used in
-#      # development.
-#      FLASK_DEBUG: "true"
-##      MONGO_INITDB_ROOT_USERNAME: root
-##      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-    ports:
-      - "5003:80"  # host:container
-    depends_on:
-      - mongo
-
-
-
   diet-service:
     build: ./diets  # path is relative to docker-compose-shorthand.yml location
     restart: always
+    environment:
+      PORT_FOR_MONGO: 27017
     ports:
       - "5002:80"  # host:container
     expose:
@@ -55,22 +29,13 @@ services:
       - "80:80"  # host:container
     depends_on:
       - meal-service
-      - meal-service-2
       - diet-service
       - mongo
 
   mongo:
     image: mongo
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: root
-#      MONGO_INITDB_ROOT_PASSWORD: rootpassword
     ports:
       - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
 
 
 

@@ -1,7 +1,6 @@
-import requests
-import json
-from flask import Flask, jsonify, request, json
-# from flask_restful import Resource, Api, reqparse
+import os
+
+from flask import Flask, jsonify, request
 from diet import Diet
 
 import pymongo
@@ -10,11 +9,14 @@ import pymongo
 app = Flask(__name__)
 # api = Api(app)
 
-client = pymongo.MongoClient("mongodb://mongo:27017/")
+port_for_mongo = os.environ.get("PORT_FOR_MONGO")
+
+client = pymongo.MongoClient("mongodb://mongo:{0}/".format(port_for_mongo))
 db = client["food_planner_db"]
 diets_collection = db["diets"]
 
 all_diets = []
+
 
 def update_all_diets_from_db():
     global all_diets
@@ -22,7 +24,7 @@ def update_all_diets_from_db():
     # defines the projection (fields to include/exclude)
     projection = {'_id': 0, 'sugar': 1, 'cal': 1, 'sodium': 1, 'name': 1}
 
-    # finds documents and apply the projection
+    # find documents and apply the projection
     diets_list_from_db = list(diets_collection.find({}, projection))
 
     # iterates over the results and adds them to the all_diets list
@@ -30,8 +32,10 @@ def update_all_diets_from_db():
         all_diets.append(Diet(diet_from_db.get("name"), diet_from_db.get("cal"), diet_from_db.get("sodium"),
                               diet_from_db.get("sugar")))
 
+
 # initializes the meals and dished from DB
 update_all_diets_from_db()
+
 
 def find_diet_in_all_diets_by_name(new_diet_name: str):
     global all_diets
@@ -39,6 +43,7 @@ def find_diet_in_all_diets_by_name(new_diet_name: str):
         if diet.name == new_diet_name:
             return diet
     return None
+
 
 @app.route('/diets', methods=['POST'])
 def diets_post():
@@ -69,9 +74,6 @@ def diets_post():
     return jsonify(successfully_create_message.format(diet_name)), 201
 
 
-
-
-
 @app.route('/diets', methods=['GET'])
 def diets_get():
     global all_diets
@@ -88,7 +90,6 @@ def diets_name_get(name):
         return jsonify(existing_diet.asdict()), 200
     else:
         return jsonify("Diet {} not found".format(name)), 404
-
 
 
 if __name__ == '__main__':

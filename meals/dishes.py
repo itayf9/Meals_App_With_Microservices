@@ -25,19 +25,18 @@ class Dishes:
         size = 0
 
         for small_dish in ninja_json:
-            calories+= small_dish["calories"]
-            sodium +=small_dish["sodium_mg"]
-            sugar +=small_dish["sugar_g"]
+            calories += small_dish["calories"]
+            sodium += small_dish["sodium_mg"]
+            sugar += small_dish["sugar_g"]
             size += small_dish["serving_size_g"]
 
-        new_dish = Dish(new_dish_name, self.dish_counter, calories,size, sodium, sugar)
+        new_dish = Dish(new_dish_name, self.dish_counter, calories, size, sodium, sugar)
 
         self.dish_counter += 1
         return new_dish
 
-    def remove_dish_by_id(self, dishID: int):
-        self.dishes.pop(dishID)
-
+    def remove_dish_by_id(self, dish_id: int):
+        self.dishes.pop(dish_id)
 
 
 all_dishes = Dishes()
