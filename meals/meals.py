@@ -66,6 +66,13 @@ class Meals:
                                                                 "sugar": value.sugar}})
 
     def remove_cal_sodium_sugar_from_meal(self, meal: Meal, cal: float, sodium: float, sugar: float):
+        """
+        updates a specific Meal object to have less cal, sodium and sugar.
+        :param meal: the Meal object to update
+        :param cal: the cal value to remove
+        :param sodium: the sodium value to remove
+        :param sugar: the sugar value to remove
+        """
         meal.cal -= cal
         meal.sodium -= sodium
         meal.sugar -= sugar

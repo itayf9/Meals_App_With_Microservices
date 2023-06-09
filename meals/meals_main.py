@@ -14,7 +14,6 @@ import pymongo
 
 # initialize
 app = Flask(__name__)
-# api = Api(app)
 
 port_for_mongo = os.environ.get("PORT_FOR_MONGO")
 
@@ -45,34 +44,41 @@ else:
 
 # initializes the meals and dished from DB
 dishes_list_from_db = list(dishes_collection.find())
-max_id_number = 0
 for dish_from_db in dishes_list_from_db:
     all_dishes.add_dish(
         Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"),
              dish_from_db.get("sodium"), dish_from_db.get("sugar")))
-    # max_id_number = dish_counter.find_one({"counter_id": 0})["cur_key"]
 
 meals_list_from_db = list(meals_collection.find())
-max_id_number = 0
 for meal_from_db in meals_list_from_db:
     all_meals.add_meal(
         Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"), meal_from_db.get("main"),
              meal_from_db.get("dessert"), meal_from_db.get("cal"), meal_from_db.get("sodium"),
              meal_from_db.get("sugar")))
-    # max_id_number = max(max_id_number, meal_from_db.get("_id"))
 
 
 def update_dishes_from_db():
+    """
+    deletes the all_dishes object and replaces it with a new Dishes object.
+    takes the information from the DB and puts it in the new Dishes object.
+    the result is an updated all_dishes object
+    """
     all_dishes = Dishes()
     dishes_list_from_db = list(dishes_collection.find())
     for dish_from_db in dishes_list_from_db:
         all_dishes.add_dish(
             Dish(dish_from_db.get("name"), dish_from_db.get("_id"), dish_from_db.get("cal"), dish_from_db.get("size"),
                  dish_from_db.get("sodium"), dish_from_db.get("sugar")))
+    # updates the dish counter to the value from dish_counter collection in the DB
     all_dishes.dish_counter = dish_counter.find_one({"counter_id": 0})["cur_key"]
 
 
 def update_all_meals_from_db():
+    """
+    deletes the all_meals object and replaces it with a new Meals object.
+    takes the information from the DB and puts it in the new Meals object.
+    the result is an updated all_meals object
+    """
     update_dishes_from_db()
     all_meals = Meals()
     meals_list_from_db = list(meals_collection.find())
@@ -80,14 +86,13 @@ def update_all_meals_from_db():
         all_meals.add_meal(Meal(meal_from_db.get("name"), meal_from_db.get("_id"), meal_from_db.get("appetizer"),
                                 meal_from_db.get("main"), meal_from_db.get("dessert"), meal_from_db.get("cal"),
                                 meal_from_db.get("sodium"), meal_from_db.get("sugar")))
+    # updates the meal counter to the value from meal_counter collection in the DB
     all_meals.meal_counter = meal_counter.find_one({"counter_id": 0})["cur_key"]
 
 
 @app.route('/dishes', methods=['GET'])
 def all_dishes_get():
     update_dishes_from_db()
-    # all_dishes_json_str = json.dumps(all_dishes.dishes, cls=DishEncoder)
-    # all_dishes_json_dict = json.loads(all_dishes_json_str)
     all_dishes_json_array = all_dishes.convert_dictionary_to_array()
 
     return jsonify(all_dishes_json_array), 200
@@ -130,6 +135,7 @@ def all_dishes_post():
     # set the "cur_key" field of the doc that meets the document_id_of_counter constraint to the updated value cur_key
     dish_counter.update_one(document_id_of_counter, {"$set": {"cur_key": cur_key}})
     dishes_collection.insert_one(new_dish.asdict())
+
     return jsonify(str(new_dish.ID)), 201
 
 
@@ -257,8 +263,6 @@ def all_meals_post():
 
 @app.route('/meals', methods=['GET'])
 def all_meals_get():
-    # all_meals_json_str = json.dumps(all_meals.meals, cls=MealEncoder)
-    # all_meals_json_dict = json.loads(all_meals_json_str)
     update_all_meals_from_db()
     all_meals_json_array = all_meals.convert_dictionary_to_array()
 

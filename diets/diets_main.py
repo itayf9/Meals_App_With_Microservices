@@ -7,7 +7,6 @@ import pymongo
 
 # initialize
 app = Flask(__name__)
-# api = Api(app)
 
 port_for_mongo = os.environ.get("PORT_FOR_MONGO")
 
@@ -19,6 +18,11 @@ all_diets = []
 
 
 def update_all_diets_from_db():
+    """
+    deletes the all_diets list and replace it with a new list.
+    takes the information from the DB and puts it the new list.
+    the result is an updated all_diets list
+    """
     global all_diets
     all_diets = []
     # defines the projection (fields to include/exclude)
@@ -38,6 +42,11 @@ update_all_diets_from_db()
 
 
 def find_diet_in_all_diets_by_name(new_diet_name: str):
+    """
+    finds the first diet object the matches a given name
+    :param new_diet_name: a string the represents the diet name to find
+    :return: a Diet object that matches the new_new_diet_name, and None if no such Diet object exists
+    """
     global all_diets
     for diet in all_diets:
         if diet.name == new_diet_name:
